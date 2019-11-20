@@ -3,7 +3,7 @@ import torch
 from torchvision.utils import make_grid
 from base import BaseTrainer
 from utils import inf_loop, MetricTracker
-
+from tqdm import tqdm
 
 class Trainer(BaseTrainer):
     """
@@ -38,7 +38,7 @@ class Trainer(BaseTrainer):
         """
         self.model.train()
         self.train_metrics.reset()
-        for batch_idx, (data, target) in enumerate(self.data_loader):
+        for batch_idx, (data, target) in enumerate(tqdm(self.data_loader)):
             data, target = data.to(self.device), target.to(self.device)
 
             self.optimizer.zero_grad()
@@ -52,12 +52,12 @@ class Trainer(BaseTrainer):
             for met in self.metric_ftns:
                 self.train_metrics.update(met.__name__, met(output, target))
 
-            if batch_idx % self.log_step == 0:
-                self.logger.debug('Train Epoch: {} {} Loss: {:.6f}'.format(
-                    epoch,
-                    self._progress(batch_idx),
-                    loss.item()))
-                self.writer.add_image('input', make_grid(data.cpu(), nrow=8, normalize=True))
+            # if batch_idx % self.log_step == 0:
+            #     self.logger.debug('Train Epoch: {} {} Loss: {:.6f}'.format(
+            #         epoch,
+            #         self._progress(batch_idx),
+            #         loss.item()))
+            #     self.writer.add_image('input', make_grid(data.cpu(), nrow=8, normalize=True))
 
             if batch_idx == self.len_epoch:
                 break
