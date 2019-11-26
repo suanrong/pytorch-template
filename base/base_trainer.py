@@ -8,7 +8,7 @@ class BaseTrainer:
     """
     Base class for all trainers
     """
-    def __init__(self, model, criterion, metric_ftns, optimizer, config):
+    def __init__(self, model, criterion, metric_ftns, optimizer, config, start_epoch=1):
         self.config = config
         self.logger = config.get_logger('trainer', config['trainer']['verbosity'])
 
@@ -38,7 +38,7 @@ class BaseTrainer:
             self.mnt_best = inf if self.mnt_mode == 'min' else -inf
             self.early_stop = cfg_trainer.get('early_stop', inf)
 
-        self.start_epoch = 1
+        self.start_epoch = start_epoch
 
         self.checkpoint_dir = config.save_dir
 
@@ -62,7 +62,7 @@ class BaseTrainer:
         Full training logic
         """
         not_improved_count = 0
-        for epoch in range(self.start_epoch, self.epochs + 1):
+        for epoch in range(self.start_epoch, self.epochs + self.start_epoch):
             result = self._train_epoch(epoch)
 
             # save logged informations into log dict
